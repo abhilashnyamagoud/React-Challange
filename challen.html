@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        customer Details Page
+    </title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script src="customer.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/babel">
+        const rootHandler = document.getElementById("root");
+        const shadow ={boxShadow: '10px 10px 8px 10px #888888'}
+       console.log(customer)
+        const data = customer;
+        const { useState } = React
+
+        function PieChart(props){
+            const freq={"one":props.one,"two":props.two,"three":props.three,"four":props.four,"fivem":props.five} //object for pie chart categoris and numbers
+    
+
+    google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([ //passing variable in pie chart
+          ['No Of Orders', 'No of Customers'],
+          ['1', freq.one],
+          ['2', freq.two],
+          ['3', freq.three],
+          ['4', freq.four],
+          ['5+',freq.fivem]
+        ]);
+
+        var options = {
+                        title: 'Customer Orders Details',
+                        is3D: true,
+                        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+        chart.draw(data, options);
+      }
+      
+    return (<div>
+            <div id="piechart_3d" style={{width:'900px',height:'500px'}}></div>
+            </div>)
+}
+
+        function DistributionOfCustomers(props) {
+            const {countOfCustomers} = props
+            // console.log(countOfCustomers)
+
+            const one = countOfCustomers.filter((ele) => {
+              return ele.count === 1
+            })
+
+            const two = countOfCustomers.filter((ele) => {
+              return ele.count === 2
+            })
+
+            const three = countOfCustomers.filter((ele) => {
+              return ele.count === 3
+            })
+
+            const four = countOfCustomers.filter((ele) => {
+              return ele.count === 4
+            })
+
+            const five = countOfCustomers.filter((ele) => {
+              return ele.count >= 5
+            })
+
+            return (
+              <div >
+                <table border="2">
+                            <thead>
+                                <tr>
+                                    <th>No.of.orders</th>
+                                    <th>count of Customers</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>1</td>
+                                <td>
+                                  {one.length}
+                                </td>
+                              </tr> 
+                              <tr> 
+                                <td>2</td>
+                                <td>
+                                  {two.length}
+                                </td>
+                              </tr>  
+                              <tr>
+                                <td>3</td>
+                                <td>
+                                  {three.length}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>4</td>
+                                <td>
+                                  {four.length}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>5+</td>
+                                <td>
+                                  {five.length}
+                                </td>
+                              </tr>
+                            </tbody>
+                        </table>
+                        <PieChart one={one.length} two={two.length} three={three.length} four={four.length} five={five.length}/>
+              </div>
+            )
+          }
+        
+        function TotalDetails(props){
+            let sum=0;
+
+            data.map((ele)=>{
+                sum = sum + (ele.Amount);
+                return sum;
+            })
+return (
+                <div >
+                    <br/>
+                <b> Total No of Customers -({props.data.length}) </b><br/>
+                <b> No of orders - ({data.length})  </b><br/>
+                <b>Total Amount -{sum}  </b><br /><br />
+        </div>)}
+        
+        function CustomerDetails(props){
+            const [customer, setCustomer] = useState(data)
+            
+            
+        const countOfCustomers = () => {
+       const uniqueCustomers=totalCustomer().slice(0)
+    //    console.log(totalCustomer())
+       uniqueCustomers.forEach((uniqueCustomer) => {
+        const result = data.filter((cust) => {
+           return uniqueCustomer.Name === cust.Name
+         })
+        //  console.log(result)
+         uniqueCustomer['count'] = result.length
+       })
+      
+       return uniqueCustomers
+
+    }   
+
+    
+    //callback function to display total number of customers
+    const totalCustomer = () => {
+     // Declare a new array 
+     let newArray = []
+     //Declare new variable
+     let custName
+              
+     // Declare an empty object 
+     let uniqueObject = {}
+                
+      // Loop for the array elements 
+      for (let i in data) { 
+        
+      // Extract the Name 
+      custName = data[i]['Name']
+        
+      // Use the Name as the index 
+      uniqueObject[custName] = data[i] 
+             
+     } 
+                
+      // Loop to push unique object into array 
+      for ( let i in uniqueObject) { 
+      newArray.push(uniqueObject[i])
+      } 
+                
+      // return the unique object's length
+      return newArray
+    }
+
+    const displayDetails = (name) => {
+      let sum = 0
+      const result = customer.filter((ele) => {
+        return ele.Name === name
+      })
+        result.forEach((ele) => {
+        sum = sum + ele.Amount
+      })
+
+      const amountsArr = result.filter((ele) => {
+        return ele.Amount
+      })
+    //   console.log(amountsArr)
+      const displayAmount=amountsArr.map((ele)=>{
+        return ele.Amount
+      })
+      alert(`No of orders - ${result.length}  Total Amount - ${sum}  Amount of Each Order - 
+      ${displayAmount}`)
+     
+      
+    }
+
+    const search = () => {
+      let newArray = []
+      const inputName = prompt('Enter the customer name or Customer Phone Number')
+      if(inputName) {
+        const result = customer.find((ele) => {
+          return (ele.Name === inputName || ele.Phone===Number(inputName))
+        })
+        console.log(result)
+        newArray.push(result)
+        alert(`${result.Name} - ${result.Phone}`);
+        setCustomer(newArray)
+      } 
+      else {
+        alert('invalid customer')
+      }
+    }
+
+    const data1=countOfCustomers();
+    
+    
+
+            return (<div>
+              <button onClick={() => {
+                  search()
+                }}>search</button>
+                <table border="1">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   {data1.map((ele,i)=>{
+                       
+                    return ( <tr key={i}>
+                            <td>{ele.Name}</td>
+                            <td>{ele.Phone}</td>
+                            <td><button onClick ={()=>{
+                                {displayDetails(ele.Name)}
+                            }}>Order Details</button></td>
+                        </tr>)
+                   })}
+                </tbody>
+                </table>
+                <TotalDetails data={countOfCustomers()} />
+                <DistributionOfCustomers 
+                    countOfCustomers={countOfCustomers()} />
+
+                </div>)
+        }
+        
+        
+        function App(props) {
+
+    return (
+        <div>
+            <CustomerDetails /> 
+        </div>
+)
+}
+ReactDOM.render(<App />, rootHandler)
+        
+    </script>
+</body>
+
+</html>
